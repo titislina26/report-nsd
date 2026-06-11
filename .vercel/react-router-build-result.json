@@ -1,0 +1,212 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "root": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/carf": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/field-ops": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/receipts": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/settings": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/login": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/logout": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/layout": {
+        "id": "routes/layout",
+        "parentId": "root",
+        "file": "app/routes/layout.tsx",
+        "config": {}
+      },
+      "routes/dashboard": {
+        "id": "routes/dashboard",
+        "parentId": "routes/layout",
+        "file": "app/routes/dashboard.tsx",
+        "index": true,
+        "config": {}
+      },
+      "routes/carf": {
+        "id": "routes/carf",
+        "parentId": "routes/layout",
+        "file": "app/routes/carf.tsx",
+        "path": "carf",
+        "config": {}
+      },
+      "routes/field-ops": {
+        "id": "routes/field-ops",
+        "parentId": "routes/layout",
+        "file": "app/routes/field-ops.tsx",
+        "path": "field-ops",
+        "config": {}
+      },
+      "routes/receipts": {
+        "id": "routes/receipts",
+        "parentId": "routes/layout",
+        "file": "app/routes/receipts.tsx",
+        "path": "receipts",
+        "config": {}
+      },
+      "routes/settings": {
+        "id": "routes/settings",
+        "parentId": "routes/layout",
+        "file": "app/routes/settings.tsx",
+        "path": "settings",
+        "config": {}
+      },
+      "routes/login": {
+        "id": "routes/login",
+        "parentId": "root",
+        "file": "app/routes/login.tsx",
+        "path": "login",
+        "config": {}
+      },
+      "routes/logout": {
+        "id": "routes/logout",
+        "parentId": "root",
+        "file": "app/routes/logout.tsx",
+        "path": "logout",
+        "config": {}
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "D:/projects/report-nsd/app",
+    "basename": "/",
+    "buildDirectory": "D:/projects/report-nsd/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "v8_passThroughRequests": true,
+      "v8_trailingSlashAwareDataRequests": true,
+      "unstable_previewServerPrerendering": false,
+      "v8_middleware": true,
+      "v8_splitRouteModules": true,
+      "v8_viteEnvironmentApi": true
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "routes/layout": {
+        "id": "routes/layout",
+        "parentId": "root",
+        "file": "routes/layout.tsx"
+      },
+      "routes/dashboard": {
+        "id": "routes/dashboard",
+        "parentId": "routes/layout",
+        "file": "routes/dashboard.tsx",
+        "index": true
+      },
+      "routes/carf": {
+        "id": "routes/carf",
+        "parentId": "routes/layout",
+        "file": "routes/carf.tsx",
+        "path": "carf"
+      },
+      "routes/field-ops": {
+        "id": "routes/field-ops",
+        "parentId": "routes/layout",
+        "file": "routes/field-ops.tsx",
+        "path": "field-ops"
+      },
+      "routes/receipts": {
+        "id": "routes/receipts",
+        "parentId": "routes/layout",
+        "file": "routes/receipts.tsx",
+        "path": "receipts"
+      },
+      "routes/settings": {
+        "id": "routes/settings",
+        "parentId": "routes/layout",
+        "file": "routes/settings.tsx",
+        "path": "settings"
+      },
+      "routes/login": {
+        "id": "routes/login",
+        "parentId": "root",
+        "file": "routes/login.tsx",
+        "path": "login"
+      },
+      "routes/logout": {
+        "id": "routes/logout",
+        "parentId": "root",
+        "file": "routes/logout.tsx",
+        "path": "logout"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "subResourceIntegrity": false,
+    "allowedActionOrigins": false,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "routes/layout.tsx",
+            "children": [
+              {
+                "file": "routes/dashboard.tsx",
+                "index": true
+              },
+              {
+                "file": "routes/carf.tsx",
+                "path": "carf"
+              },
+              {
+                "file": "routes/field-ops.tsx",
+                "path": "field-ops"
+              },
+              {
+                "file": "routes/receipts.tsx",
+                "path": "receipts"
+              },
+              {
+                "file": "routes/settings.tsx",
+                "path": "settings"
+              }
+            ]
+          },
+          {
+            "file": "routes/login.tsx",
+            "path": "login"
+          },
+          {
+            "file": "routes/logout.tsx",
+            "path": "logout"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
