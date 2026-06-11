@@ -16,7 +16,7 @@ const navigation = [
   { name: "Receipts", href: "/receipts", icon: Receipt, description: "Generator Kwitansi" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
   const location = useLocation();
 
   return (
@@ -44,6 +44,7 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={onLinkClick}
                 className={cn(
                   isActive
                     ? "bg-white/10 text-white"
@@ -79,6 +80,7 @@ export function Sidebar() {
       <div className="border-t border-slate-800 p-3">
         <Link
           to="/settings"
+          onClick={onLinkClick}
           className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all duration-150"
         >
           <Settings className="h-4 w-4 flex-shrink-0 text-slate-500 group-hover:text-slate-300 transition-colors" />

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useLoaderData, redirect } from "react-router";
-import { createClient } from "~/lib/server";
+import { useLoaderData } from "react-router";
+import { requireMockUser } from "~/lib/auth";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Badge } from "~/components/ui/badge";
 import { Label } from "~/components/ui/label";
 import {
   Table,
@@ -46,6 +45,9 @@ import {
   FileText,
   X,
   Loader2,
+  Trash2,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Route } from "./+types/carf";
@@ -58,10 +60,8 @@ export function meta() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { supabase } = createClient(request);
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return redirect("/login");
-  return { user: session.user };
+  const user = requireMockUser(request);
+  return { user };
 }
 
 // --- Types ---
@@ -82,13 +82,19 @@ interface CarfRecord {
 }
 
 // --- Mock Data (replace with Supabase) ---
-const MOCK_CARF: CarfRecord[] = [
+const INITIAL_CARF: CarfRecord[] = [
   { id: "1", trans_code: "CARF-2026-041", req_date: "2026-06-11", requestor_name: "Budi Santoso", doc_type: "CARF NT", area_type: "PAPUA", division: "NSD", description_needs: "Install VSAT Papua Remote", amount: 5000000, status: "Pending", start_date: "2026-06-12", end_date: "2026-06-15", description_funds: "DP 1: Rp 2.500.000 | DP 2: Rp 1.500.000 | Pelunasan: Rp 1.000.000" },
   { id: "2", trans_code: "CARF-2026-040", req_date: "2026-06-10", requestor_name: "Andi Wijaya", doc_type: "CARF T", area_type: "JAWA", division: "NSD", description_needs: "Maintenance RTGS Jabar", amount: 2500000, status: "Paid", start_date: "2026-06-10", end_date: "2026-06-11", description_funds: "Full Payment: Rp 2.500.000" },
   { id: "3", trans_code: "CARF-2026-039", req_date: "2026-06-09", requestor_name: "Siti Aminah", doc_type: "CARF NT", area_type: "SULAWESI", division: "NSD", description_needs: "UBIQU Site Survey Sulsel", amount: 10000000, status: "Done", start_date: "2026-06-09", end_date: "2026-06-12", description_funds: "DP 1: Rp 5.000.000 | Pelunasan: Rp 5.000.000" },
   { id: "4", trans_code: "CARF-2026-038", req_date: "2026-06-08", requestor_name: "Doni Pratama", doc_type: "CARF T", area_type: "PAPUA", division: "NSD", description_needs: "LoRa Gateway Installation Sorong", amount: 7500000, status: "Done", start_date: "2026-06-08", end_date: "2026-06-10", description_funds: "Full Payment: Rp 7.500.000" },
   { id: "5", trans_code: "CARF-2026-037", req_date: "2026-06-07", requestor_name: "Budi Santoso", doc_type: "CARF NT", area_type: "NON-PAPUA", division: "NSD", description_needs: "PSN RTGS Upgrade Kalimantan", amount: 12000000, status: "Not Yet", start_date: "2026-06-14", end_date: "2026-06-18", description_funds: "" },
   { id: "6", trans_code: "CARF-2026-036", req_date: "2026-06-06", requestor_name: "Rina Kartika", doc_type: "CARF T", area_type: "JAWA", division: "NSD", description_needs: "Jasa Teknisi Install Mikrotik", amount: 1500000, status: "Paid", start_date: "2026-06-06", end_date: "2026-06-06", description_funds: "Full Payment: Rp 1.500.000" },
+  { id: "7", trans_code: "CARF-2026-035", req_date: "2026-06-05", requestor_name: "Ahmad Fauzi", doc_type: "CARF NT", area_type: "NON-PAPUA", division: "NSD", description_needs: "Survey Jaringan Sumut", amount: 8500000, status: "Done", start_date: "2026-06-10", end_date: "2026-06-12", description_funds: "DP 1: Rp 4.000.000 | Pelunasan: Rp 4.500.000" },
+  { id: "8", trans_code: "CARF-2026-034", req_date: "2026-06-04", requestor_name: "Siti Aminah", doc_type: "CARF T", area_type: "SULAWESI", division: "NSD", description_needs: "UBIQU Install Makassar", amount: 6000000, status: "Paid", start_date: "2026-06-04", end_date: "2026-06-05", description_funds: "Full Payment: Rp 6.000.000" },
+  { id: "9", trans_code: "CARF-2026-033", req_date: "2026-06-03", requestor_name: "Doni Pratama", doc_type: "CARF NT", area_type: "PAPUA", division: "NSD", description_needs: "VSAT Troubleshoot Ternate", amount: 9000000, status: "Done", start_date: "2026-06-05", end_date: "2026-06-07", description_funds: "DP 1: Rp 4.500.000 | Pelunasan: Rp 4.500.000" },
+  { id: "10", trans_code: "CARF-2026-032", req_date: "2026-06-02", requestor_name: "Rina Kartika", doc_type: "CARF NT", area_type: "JAWA", division: "NSD", description_needs: "Mikrotik Setup Semarang", amount: 3500000, status: "Pending", start_date: "2026-06-11", end_date: "2026-06-11", description_funds: "DP 1: Rp 2.000.000 | Pelunasan: Rp 1.500.000" },
+  { id: "11", trans_code: "CARF-2026-031", req_date: "2026-06-01", requestor_name: "Budi Santoso", doc_type: "CARF T", area_type: "PAPUA", division: "NSD", description_needs: "Mikrotik Install Bandung", amount: 2000000, status: "Paid", start_date: "2026-06-01", end_date: "2026-06-01", description_funds: "Full Payment: Rp 2.000.000" },
+  { id: "12", trans_code: "CARF-2026-030", req_date: "2026-05-30", requestor_name: "Andi Wijaya", doc_type: "CARF NT", area_type: "NON-PAPUA", division: "NSD", description_needs: "LoRa Expansion Kalimantan Barat", amount: 15000000, status: "Not Yet", start_date: "2026-06-20", end_date: "2026-06-25", description_funds: "" },
 ];
 
 const AREAS = ["Semua", "PAPUA", "NON-PAPUA", "JAWA", "SULAWESI"];
@@ -256,22 +262,31 @@ function CarfFormModal({
 function CarfDetailSheet({
   record,
   onClose,
+  onUpdateStatus,
+  onDelete,
 }: {
   record: CarfRecord | null;
   onClose: () => void;
+  onUpdateStatus: (id: string, status: CarfRecord["status"]) => void;
+  onDelete: (id: string) => void;
 }) {
-  return (
-    <Sheet open={!!record} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-        <SheetHeader className="pb-4">
-          <SheetTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-slate-500" />
-            Detail Pengajuan
-          </SheetTitle>
-          <SheetDescription>{record?.trans_code}</SheetDescription>
-        </SheetHeader>
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  if (!record) return null;
 
-        {record && (
+  const statusFlow: CarfRecord["status"][] = ["Not Yet", "Pending", "Done", "Paid"];
+
+  return (
+    <>
+      <Sheet open={!!record} onOpenChange={(v) => !v && onClose()}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-slate-500" />
+              Detail Pengajuan
+            </SheetTitle>
+            <SheetDescription>{record.trans_code}</SheetDescription>
+          </SheetHeader>
+
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <StatusBadge status={record.status} />
@@ -321,14 +336,76 @@ function CarfDetailSheet({
               </div>
             </div>
 
-            <div className="flex gap-2 pt-4">
+            <Separator />
+
+            {/* Status Update */}
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+                <RefreshCw className="h-3.5 w-3.5 text-slate-400" />
+                Update Status
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {statusFlow.map((s) => (
+                  <Button
+                    key={s}
+                    size="sm"
+                    variant={record.status === s ? "default" : "outline"}
+                    className="text-xs h-7"
+                    onClick={() => {
+                      onUpdateStatus(record.id, s);
+                      toast.success(`Status diperbarui ke "${s}"`);
+                    }}
+                  >
+                    {s}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
               <Button className="flex-1" variant="outline" onClick={onClose}>Tutup</Button>
-              <Button className="flex-1">Edit Pengajuan</Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => setShowDeleteConfirm(true)}
+                title="Hapus pengajuan"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        )}
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
+
+      {/* Delete Confirmation */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Hapus Pengajuan
+            </DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus pengajuan <strong>{record.trans_code}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Batal</Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                onDelete(record.id);
+                setShowDeleteConfirm(false);
+                onClose();
+                toast.success("Pengajuan berhasil dihapus.");
+              }}
+            >
+              Hapus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -336,6 +413,7 @@ function CarfDetailSheet({
 const PAGE_SIZE = 5;
 
 export default function CarfManagement() {
+  const [carfData, setCarfData] = useState<CarfRecord[]>(INITIAL_CARF);
   const [search, setSearch] = useState("");
   const [filterArea, setFilterArea] = useState("Semua");
   const [filterStatus, setFilterStatus] = useState("Semua");
@@ -345,7 +423,16 @@ export default function CarfManagement() {
   const [editRecord, setEditRecord] = useState<CarfRecord | null>(null);
   const [detailRecord, setDetailRecord] = useState<CarfRecord | null>(null);
 
-  const filtered = MOCK_CARF.filter((r) => {
+  function handleUpdateStatus(id: string, status: CarfRecord["status"]) {
+    setCarfData((prev) => prev.map((r) => r.id === id ? { ...r, status } : r));
+    setDetailRecord((prev) => prev?.id === id ? { ...prev, status } : prev);
+  }
+
+  function handleDeleteRecord(id: string) {
+    setCarfData((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  const filtered = carfData.filter((r) => {
     const matchSearch =
       r.trans_code.toLowerCase().includes(search.toLowerCase()) ||
       r.requestor_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -539,7 +626,12 @@ export default function CarfManagement() {
         onClose={() => { setShowCreate(false); setEditRecord(null); }}
         initial={editRecord}
       />
-      <CarfDetailSheet record={detailRecord} onClose={() => setDetailRecord(null)} />
+      <CarfDetailSheet
+        record={detailRecord}
+        onClose={() => setDetailRecord(null)}
+        onUpdateStatus={handleUpdateStatus}
+        onDelete={handleDeleteRecord}
+      />
     </div>
   );
 }

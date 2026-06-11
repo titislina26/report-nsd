@@ -6,6 +6,7 @@ export default [
     route("carf", "routes/carf.tsx"),
     route("field-ops", "routes/field-ops.tsx"),
     route("receipts", "routes/receipts.tsx"),
+    route("settings", "routes/settings.tsx"),
   ]),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),

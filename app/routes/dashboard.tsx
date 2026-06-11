@@ -1,7 +1,6 @@
-import { createClient } from "~/lib/server";
-import { redirect, useLoaderData } from "react-router";
+import { requireMockUser } from "~/lib/auth";
+import { useLoaderData } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -34,10 +33,8 @@ export function meta() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { supabase } = createClient(request);
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return redirect("/login");
-  return { user: session.user };
+  const user = requireMockUser(request);
+  return { user };
 }
 
 // Mock data (will be replaced by Supabase data)

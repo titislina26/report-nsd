@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Form, redirect, useNavigation, useActionData, Link } from "react-router";
+import { Form, redirect, useNavigation, useActionData, Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Eye, EyeOff, Loader2, Wifi } from "lucide-react";
-import { createClient } from "~/lib/server";
+import { Eye, EyeOff, Loader2, Wifi, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { Route } from "./+types/login";
 
 export function meta() {
@@ -14,33 +13,58 @@ export function meta() {
   ];
 }
 
+// Mock credentials — will be replaced with Supabase auth later
+const MOCK_USERS = [
+  { email: "admin@mahaga.com", password: "demo1234", name: "Admin Mahaga", role: "Admin" },
+  { email: "supervisor@mahaga.com", password: "demo1234", name: "Supervisor NSD", role: "Supervisor" },
+  { email: "finance@mahaga.com", password: "demo1234", name: "Tim Finance", role: "Finance" },
+];
+
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const { supabase, headers } = createClient(request);
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  // Simulate network delay
+  await new Promise((r) => setTimeout(r, 800));
 
-  if (error) {
-    return { error: error.message };
+  const user = MOCK_USERS.find(
+    (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+  );
+
+  if (!user) {
+    return { error: "Email atau password tidak valid. Gunakan akun demo yang tersedia." };
   }
+
+  // Set mock session cookie
+  const headers = new Headers();
+  headers.set(
+    "Set-Cookie",
+    `mock-session=${encodeURIComponent(JSON.stringify({ email: user.email, name: user.name, role: user.role }))}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`
+  );
 
   return redirect("/", { headers });
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { supabase } = createClient(request);
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) return redirect("/");
+  const cookieHeader = request.headers.get("Cookie") ?? "";
+  const hasSession = cookieHeader.includes("mock-session=");
+  if (hasSession) return redirect("/");
   return null;
 }
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const navigation = useNavigation();
   const actionData = useActionData<typeof action>();
   const isSubmitting = navigation.state === "submitting";
+
+  // Trigger shake animation on error
+  if (actionData?.error && !isShaking) {
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), 600);
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -83,6 +107,20 @@ export default function Login() {
               </div>
             ))}
           </div>
+
+          {/* Demo accounts info */}
+          <div className="mt-10 bg-white/5 border border-white/10 rounded-xl p-4 text-left">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Akun Demo Tersedia
+            </p>
+            {MOCK_USERS.map((u) => (
+              <div key={u.email} className="flex items-center justify-between py-1">
+                <span className="text-xs text-slate-300 font-mono">{u.email}</span>
+                <span className="text-xs text-slate-500 bg-white/5 px-2 py-0.5 rounded">{u.role}</span>
+              </div>
+            ))}
+            <p className="text-xs text-slate-500 mt-2">Password semua: <span className="font-mono text-slate-400">demo1234</span></p>
+          </div>
         </div>
       </div>
 
@@ -96,7 +134,20 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <div
+            className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8"
+            style={{
+              animation: isShaking ? "shake 0.5s ease-in-out" : undefined,
+            }}
+          >
+            <style>{`
+              @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 50%, 90% { transform: translateX(-6px); }
+                30%, 70% { transform: translateX(6px); }
+              }
+            `}</style>
+
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-slate-900">Selamat datang kembali</h2>
               <p className="text-slate-500 mt-1 text-sm">
@@ -106,8 +157,9 @@ export default function Login() {
 
             <Form method="post" className="space-y-5">
               {actionData?.error && (
-                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                  {actionData.error}
+                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                  <p className="text-sm text-red-700">{actionData.error}</p>
                 </div>
               )}
 
@@ -124,6 +176,7 @@ export default function Login() {
                   placeholder="admin@mahaga.com"
                   className="h-11"
                   disabled={isSubmitting}
+                  defaultValue="admin@mahaga.com"
                 />
               </div>
 
@@ -132,12 +185,6 @@ export default function Login() {
                   <Label htmlFor="password" className="text-slate-700 text-sm font-medium">
                     Password
                   </Label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
-                  >
-                    Lupa password?
-                  </Link>
                 </div>
                 <div className="relative">
                   <Input
@@ -149,6 +196,7 @@ export default function Login() {
                     placeholder="••••••••"
                     className="h-11 pr-11"
                     disabled={isSubmitting}
+                    defaultValue="demo1234"
                   />
                   <button
                     type="button"
@@ -175,6 +223,28 @@ export default function Login() {
                 )}
               </Button>
             </Form>
+
+            {/* Demo hint */}
+            <div className="mt-5 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-blue-700">Mode Demo</p>
+                  <p className="text-xs text-blue-600 mt-0.5">
+                    Form sudah terisi otomatis. Tekan <strong>Masuk</strong> untuk mencoba.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile demo accounts */}
+            <div className="lg:hidden mt-5 border border-slate-100 rounded-lg p-3">
+              <p className="text-xs text-slate-500 font-medium mb-2">Akun Demo:</p>
+              {MOCK_USERS.map((u) => (
+                <p key={u.email} className="text-xs text-slate-400 font-mono">{u.email}</p>
+              ))}
+              <p className="text-xs text-slate-400 mt-1">Password: <span className="font-mono">demo1234</span></p>
+            </div>
 
             <div className="mt-6 pt-6 border-t border-slate-100">
               <p className="text-xs text-center text-slate-400">
